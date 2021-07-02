@@ -24,6 +24,9 @@
           <template #tags>
             <slot name="tags" />
           </template>
+          <template #viewed>
+            <slot name="viewed" />
+          </template>
         </ResponsiveRowSmall>
 
         <ResponsiveRowMedium v-else-if="$vuetify.breakpoint.mdAndDown">
@@ -45,6 +48,9 @@
           <template #tags>
             <slot name="tags" />
           </template>
+          <template #viewed>
+            <slot name="viewed" />
+          </template>
         </ResponsiveRowMedium>
 
         <ResponsiveRowLarge v-else>
@@ -65,6 +71,9 @@
           </template>
           <template #tags>
             <slot name="tags" />
+          </template>
+          <template #viewed>
+            <slot name="viewed" />
           </template>
         </ResponsiveRowLarge>
       </v-card>

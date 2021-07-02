@@ -20,7 +20,7 @@
       </v-card>
     </v-col>
 
-    <v-col class="pa-0" :cols="4">
+    <v-col class="pa-0" :cols="3">
       <v-card tile flat class="fill-height">
         <slot name="title" />
       </v-card>
@@ -29,6 +29,12 @@
     <v-col class="pa-0" :cols="2">
       <v-card tile flat class="fill-height">
         <slot name="tags" />
+      </v-card>
+    </v-col>
+
+    <v-col class="pa-0" :cols="1">
+      <v-card tile flat class="fill-height text-center">
+        <slot name="viewed" />
       </v-card>
     </v-col>
   </v-row>

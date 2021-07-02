@@ -82,6 +82,39 @@
         </v-tooltip>
       </v-chip-group>
     </template>
+
+    <template #viewed>
+      <v-container class="py-0 my-0 fill-height">
+        <v-layout
+          class="py-0 my-0"
+          :justify-center="$vuetify.breakpoint.lgAndUp"
+          :align-center="$vuetify.breakpoint.lgAndUp"
+        >
+          <v-chip
+            v-if="!$vuetify.breakpoint.lgAndUp"
+            class="my-2"
+            label
+            :color="viewed_color"
+            outlined
+          >
+            <v-checkbox
+              v-model="wasViewed"
+              class="align-center justify-center py-0 my-0 pl-0"
+              hide-details
+              :label="$vuetify.breakpoint.lgAndUp ? '' : 'Viewed'"
+              @click="$emit('control-viewed', control)"
+            />
+          </v-chip>
+          <v-checkbox
+            v-else
+            v-model="wasViewed"
+            class="my-0"
+            hide-details
+            @click="$emit('control-viewed', control)"
+          />
+        </v-layout>
+      </v-container>
+    </template>
   </ResponsiveRowSwitch>
 </template>
 
@@ -112,8 +145,12 @@ interface Tag {
 export default class ControlRowHeader extends mixins(HtmlSanitizeMixin) {
   @Prop({type: Object, required: true})
   readonly control!: context.ContextualizedControl;
+  @Prop({type: Array, required: true})
+  readonly viewedControls!: string[];
   @Prop({type: Boolean, default: false}) readonly controlExpanded!: boolean;
   @Prop({type: Boolean, default: false}) readonly showImpact!: boolean;
+
+  controlWasViewed = false;
 
   get filename(): string | undefined {
     return _.get(this.control, 'sourced_from.sourced_from.from_file.filename')
@@ -130,6 +167,19 @@ export default class ControlRowHeader extends mixins(HtmlSanitizeMixin) {
   get status_color(): string {
     // maps stuff like "not applicable" -> "statusnotapplicable", which is a defined color name
     return `status${this.control.root.hdf.status.replace(' ', '')}`;
+  }
+
+  get viewed_color(): string {
+    return this.wasViewed ? 'blue' : '';
+  }
+
+  get wasViewed(): boolean {
+    this.controlWasViewed = this.viewedControls.indexOf(this.control.data.id) !== -1;
+    return this.controlWasViewed;
+  }
+
+  set wasViewed(value: boolean) {
+    this.controlWasViewed = value;
   }
 
   severity_arrow_count(severity: string): number {
