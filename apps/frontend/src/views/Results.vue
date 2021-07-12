@@ -35,6 +35,9 @@
           </template>
           <v-list class="py-0">
             <v-list-item class="px-0">
+              <ExportPOAM :filter="all_filter" />
+            </v-list-item>
+            <v-list-item class="px-0">
               <ExportCaat :filter="all_filter" />
             </v-list-item>
             <v-list-item class="px-0">
@@ -197,6 +200,7 @@ import SeverityChart from '@/components/cards/SeverityChart.vue';
 import ComplianceChart from '@/components/cards/ComplianceChart.vue';
 import UploadButton from '@/components/generic/UploadButton.vue';
 
+import ExportPOAM from '@/components/global/ExportPOAM.vue'
 import ExportCaat from '@/components/global/ExportCaat.vue';
 import ExportNist from '@/components/global/ExportNist.vue';
 import ExportJson from '@/components/global/ExportJson.vue';
@@ -228,6 +232,7 @@ import {IEvaluation} from '@heimdall/interfaces';
     SeverityChart,
     ComplianceChart,
     ExportCaat,
+    ExportPOAM,
     ExportNist,
     ExportJson,
     EvaluationInfo,
