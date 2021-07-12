@@ -1,6 +1,7 @@
 <template>
   <Base :title="curr_title" @changed-files="evalInfo = null">
     <!-- Topbar content - give it a search bar -->
+    <Tour name="Results" />
     <template #topbar-content>
       <v-text-field
         v-show="showSearchMobile || !$vuetify.breakpoint.xs"
@@ -20,7 +21,7 @@
       <v-btn v-if="$vuetify.breakpoint.xs" class="mr-2" @click="showSearch">
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
-      <v-btn :disabled="!can_clear" @click="clear">
+      <v-btn id="clear-filters" :disabled="!can_clear" @click="clear">
         <span class="d-none d-md-inline pr-2"> Clear </span>
         <v-icon>mdi-filter-remove</v-icon>
       </v-btn>
@@ -28,7 +29,7 @@
       <div class="text-center">
         <v-menu>
           <template #activator="{on, attrs}">
-            <v-btn v-bind="attrs" class="mr-2" v-on="on">
+            <v-btn id="file-export" v-bind="attrs" class="mr-2" v-on="on">
               <span class="d-none d-md-inline mr-2"> Export </span>
               <v-icon> mdi-file-export </v-icon>
             </v-btn>
@@ -51,7 +52,7 @@
     <!-- The main content: cards, etc -->
     <template #main-content>
       <v-container fluid grid-list-md pt-0 pa-2>
-        <v-container id="fileCards" mx-0 px-0 fluid>
+        <v-container id="file-cards" mx-0 px-0 fluid>
           <!-- Evaluation Info -->
           <v-row no-gutters class="mx-n3 mb-3">
             <v-col>
@@ -81,13 +82,14 @@
         </v-container>
         <!-- Count Cards -->
         <StatusCardRow
+          id="status-card-row"
           :filter="all_filter"
           :current-status-filter="statusFilter"
           @show-errors="statusFilter = 'Profile Error'"
           @show-waived="statusFilter = 'Waived'"
         />
         <!-- Compliance Cards -->
-        <v-row justify="space-around">
+        <v-row id="compliance-cards" justify="space-around">
           <v-col xs="4">
             <v-card class="fill-height">
               <v-card-title class="justify-center">Status Counts</v-card-title>
@@ -126,7 +128,7 @@
         </v-row>
 
         <!-- TreeMap and Partition Map -->
-        <v-row>
+        <v-row id="treemap">
           <v-col xs-12>
             <v-card elevation="2">
               <v-card-title>Tree Map</v-card-title>
@@ -196,6 +198,8 @@ import StatusChart from '@/components/cards/StatusChart.vue';
 import SeverityChart from '@/components/cards/SeverityChart.vue';
 import ComplianceChart from '@/components/cards/ComplianceChart.vue';
 import UploadButton from '@/components/generic/UploadButton.vue';
+import EditEvaluationModal from '@/components/global/upload_tabs/EditEvaluationModal.vue';
+import Tour from '@/components/generic/Tour.vue';
 
 import ExportCaat from '@/components/global/ExportCaat.vue';
 import ExportNist from '@/components/global/ExportNist.vue';
@@ -232,7 +236,9 @@ import {IEvaluation} from '@heimdall/interfaces';
     ExportJson,
     EvaluationInfo,
     ProfileData,
-    UploadButton
+    UploadButton,
+    EditEvaluationModal,
+    Tour
   }
 })
 export default class Results extends mixins(RouteMixin, ServerMixin) {

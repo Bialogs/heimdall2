@@ -17,7 +17,9 @@
         @change="selected_tab"
       >
         <!-- Define our tabs -->
-        <v-tab id="select-tab-local" href="#uploadtab-local">Local Files</v-tab>
+        <v-tab id="select-tab-local" href="#uploadtab-local">
+          Local Files
+        </v-tab>
 
         <v-tab
           v-if="serverMode"
