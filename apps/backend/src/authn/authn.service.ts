@@ -1,7 +1,17 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException
+} from '@nestjs/common';
 import {JwtService} from '@nestjs/jwt';
 import {compare} from 'bcryptjs';
 import * as crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import _ from 'lodash';
+import {ApiKeyService} from '../apikeys/apikey.service';
+import {ConfigService} from '../config/config.service';
 import {CreateUserDto} from '../users/dto/create-user.dto';
 import {User} from '../users/user.model';
 import {UsersService} from '../users/users.service';
@@ -9,6 +19,9 @@ import {UsersService} from '../users/users.service';
 @Injectable()
 export class AuthnService {
   constructor(
+    private readonly apiKeyService: ApiKeyService,
+    private readonly configService: ConfigService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService
   ) {}
@@ -26,6 +39,37 @@ export class AuthnService {
     } else {
       return null;
     }
+  }
+
+  async validateApiKey(apikey: string): Promise<User | null> {
+    const APIKeySecret = this.configService.get('API_KEY_SECRET');
+    if (APIKeySecret) {
+      try {
+        const jwtPayload = jwt.verify(apikey, APIKeySecret) as {
+          token: string;
+          keyId: string;
+          createdAt: Date;
+        };
+        const JWTSignature = apikey.split('.')[2];
+        if (_.has(jwtPayload, 'keyId')) {
+          const matchingKey = await this.apiKeyService.findById(
+            jwtPayload.keyId
+          );
+          if (await compare(JWTSignature, matchingKey.apiKey)) {
+            return matchingKey.user;
+          } else {
+            throw new UnauthorizedException('Unknown API-Key');
+          }
+        }
+      } catch {
+        throw new UnauthorizedException('Invalid API-Key Signature');
+      }
+    } else {
+      throw new ForbiddenException(
+        'API Keys have been disabled as the API-Key secret is not set'
+      );
+    }
+    throw new UnauthorizedException('Bad API-Key');
   }
 
   async validateOrCreateUser(
@@ -100,5 +144,23 @@ export class AuthnService {
       firstName: nameArray.slice(0, -1).join(' '),
       lastName: nameArray[nameArray.length - 1]
     };
+  }
+
+  async testPassword(
+    updateUserDto: {currentPassword?: string},
+    user: User
+  ): Promise<void> {
+    try {
+      if (
+        !(await compare(
+          updateUserDto.currentPassword || '',
+          user.encryptedPassword
+        ))
+      ) {
+        throw new ForbiddenException('Current password is incorrect');
+      }
+    } catch {
+      throw new ForbiddenException('Current password is incorrect');
+    }
   }
 }

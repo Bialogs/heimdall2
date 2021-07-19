@@ -78,10 +78,10 @@
       </template>
       <template #no-data> No groups match current selection. </template>
     </v-data-table>
-    <DeleteDialog
+    <ActionDialog
       v-model="dialogDelete"
       type="group"
-      @cancel="closeDeleteDialog"
+      @cancel="closeActionDialog"
       @confirm="deleteGroupConfirm"
     />
     <GroupUsers
@@ -93,20 +93,21 @@
 </template>
 
 <script lang="ts">
-import {SnackbarModule} from '@/store/snackbar';
-import {IGroup, ISlimUser} from '@heimdall/interfaces';
-import GroupModal from '@/components/global/groups/GroupModal.vue';
-import Vue from 'vue';
+import ActionDialog from '@/components/generic/ActionDialog.vue';
 import Component from 'vue-class-component';
-import {Prop} from 'vue-property-decorator';
+import GroupModal from '@/components/global/groups/GroupModal.vue';
 import {GroupsModule} from '@/store/groups';
-import DeleteDialog from '@/components/generic/DeleteDialog.vue';
-import Users from '@/components/global/groups/Users.vue';
+import {IGroup, ISlimUser} from '@heimdall/interfaces';
+import {Prop} from 'vue-property-decorator';
+import {SnackbarModule} from '@/store/snackbar';
 import GroupUsers from '@/components/global/groups/GroupUsers.vue';
+import Users from '@/components/global/groups/Users.vue';
+import Vue from 'vue';
+
 
 @Component({
   components: {
-    DeleteDialog,
+    ActionDialog,
     GroupModal,
     Users,
     GroupUsers
@@ -156,12 +157,12 @@ export default class GroupManagement extends Vue {
       GroupsModule.DeleteGroup(this.editedGroup).then((data) => {
         SnackbarModule.notify(`Successfully deleted group ${data.name}`);
       }).finally(() => {
-        this.closeDeleteDialog();
+        this.closeActionDialog();
       });
     }
   }
 
-  closeDeleteDialog() {
+  closeActionDialog() {
     this.dialogDelete = false
     this.editedGroup = null;
   }
